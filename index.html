@@ -1,139 +1,68 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Text Analysis</title>
-  </head>
-  <body>
-    <h1>Text Analysis</h1>
-    <form>
-      <label for="text">Enter text:</label>
-      <textarea id="text" name="text" rows="10" cols="50"></textarea>
-      <br>
-      <button type="button" onclick="analyze()">LIKS</button>
-      <button type="button" onclick="calculateScrabbleScore()">Scrabble Score</button>
-	  <button type="button" onclick="calculateCommonalityScore()">Commonality Score</button>
-	  
-	  
-    </form>
-    <p id="results"></p>
+<head>
+	<title>Text Analysis</title>
+	<script>
+		// Define function to calculate scrabble score of a word
+		function getWordScore(word) {
+			const letterValues = {
+				'a': 1, 'b': 4, 'c': 10, 'd': 1, 'e': 1, 'f': 2, 'g': 2, 'h': 3,
+				'i': 1, 'j': 4, 'k': 2, 'l': 1, 'm': 2, 'n': 1, 'o': 2, 'p': 4,
+				'q': 10, 'r': 1, 's': 1, 't': 1, 'u': 4, 'v': 4, 'w': 8, 'x': 10,
+				'y': 6, 'z': 10, 'æ': 6, 'ø': 5, 'å': 4
+			};
+			let score = 0;
+			for (let i = 0; i < word.length; i++) {
+				score += letterValues[word[i].toLowerCase()] || 0;
+			}
+			return score;
+		}
 
-    <script>
-      function analyze() {
-        // Get the text entered by the user
-        var text = document.getElementById("text").value;
+		// Define function to analyze text on form submit
+		function analyzeText() {
+			const text = document.getElementById('text').value;
+			const words = text.trim().split(/\s+/);
+			const sentences = text.trim().split(/[.!?]/).filter(Boolean);
 
-        // Count the number of words in the text
-        var wordCount = text.split(/\s+/).length;
+			const numWords = words.length;
+			const numLongWords = words.filter(word => word.length > 6).length;
+			const numSentences = sentences.length;
+			const avgWordLength = numWords > 0 ? words.join('').length / numWords : 0;
+			const avgSentenceLength = numSentences > 0 ? numWords / numSentences : 0;
+			const lesbarhetsindeks = numWords > 0 ? (numWords / numSentences + 100 * numLongWords / numWords) / 2 : 0;
+			const wordScores = words.map(getWordScore);
+			const avgWordScore = numWords > 0 ? wordScores.reduce((sum, score) => sum + score, 0) / numWords : 0;
+			const sentenceScores = sentences.map(sentence => sentence.split(/\s+/).map(getWordScore).reduce((sum, score) => sum + score, 0));
+			const avgSentenceScore = numSentences > 0 ? sentenceScores.reduce((sum, score) => sum + score, 0) / numSentences : 0;
 
-        // Count the number of words with more than six letters
-        var longWordCount = text.split(/\s+/).filter(function(word) {
-          return word.length > 6;
-        }).length;
-
-        // Count the number of sentences in the text
-        var sentenceCount = text.split(/[.!?]+/).length - 1;
-
-        // Calculate the average number of letters in each word
-        var averageLetters = text.split(/\s+/).reduce(function(total, word) {
-          return total + word.length;
-        }, 0) / wordCount;
-
-        // Calculate the average number of words in each sentence
-        var averageWords = wordCount / sentenceCount;
-
-	    // Calculate the LIKS score
-	    var liks = (wordCount / sentenceCount) + (longWordCount * 100 / wordCount);
-		
-        // Display the results
-        var results = "Number of words: " + wordCount + "<br>" +
-                      "Number of words with more than six letters: " + longWordCount + "<br>" +
-                      "Number of sentences: " + sentenceCount + "<br>" +
-                      "Average number of letters per word: " + averageLetters.toFixed(2) + "<br>" +
-                      "Average number of words per sentence: " + averageWords.toFixed(2) + "<br>" +
-					  "LIKS score: " + liks.toFixed(2);
-        document.getElementById("results").innerHTML = results;
-      }
-	 
-// Calculate Scrabble Score
-	  function calculateScrabbleScore() {
-	    // Define the values of each letter
-	    var letterValues = {
-	      "A": 1, "B": 4, "C": 10, "D": 1, "E": 1, "F": 2, "G": 2, "H": 3, "I": 1,
-	      "J": 4, "K": 2, "L": 1, "M": 2, "N": 1, "O": 2, "P": 4, "Q": 10, "R": 1,
-	      "S": 1, "T": 1, "U": 4, "V": 4, "W": 8, "X": 10, "Y": 6, "Z": 10,
-	      "Æ": 6, "Ø": 5, "Å": 4
-	    };
-
-	    // Get the text entered by the user
-	    var text = document.getElementById("text").value;
-
-	    // Split the text into words
-	    var words = text.split(/\s+/);
-
-	    // Calculate the scrabble score of each word
-	    var wordScores = words.map(function(word) {
-	      // Convert the word to uppercase to simplify lookup in the letterValues object
-	      var upperCaseWord = word.toUpperCase();
-
-	      // Calculate the score for each letter in the word
-	      var score = 0;
-	      for (var i = 0; i < upperCaseWord.length; i++) {
-	        var letter = upperCaseWord[i];
-	        score += letterValues[letter] || 0;
-	      }
-
-	      return score;
-	    });
-
-	    // Calculate the average scrabble score of all the words
-	    var averageScore = wordScores.reduce(function(total, score) {
-	      return total + score;
-	    }, 0) / wordScores.length;
-
-	    // Display the average scrabble score on the webpage
-	    var results = "Average scrabble score: " + averageScore.toFixed(2);
-	    document.getElementById("results").innerHTML = results;
-	  }
-	  
-// Calculate Commonality Score
-	  function calculateCommonalityScore() {
-	    // Get the text entered by the user
-	    var text = document.getElementById("text").value;
-
-	    // Load the top 10000 words list
-	    var xhr = new XMLHttpRequest();
-	    xhr.open("GET", "top10000words.txt", true);
-	    xhr.onreadystatechange = function() {
-	      if (xhr.readyState === 4 && xhr.status === 200) {
-	        var words = xhr.responseText.split("\n").map(function(line) {
-	          return line.split(",");
-	        });
-
-	        // Calculate the percentile rank of each word in the text
-	        var ranks = text.toLowerCase().match(/\b\w+\b/g).map(function(word) {
-	          var rank = words.findIndex(function(entry) {
-	            return entry[0] === word;
-	          });
-	          return rank >= 0 ? words[rank][2] : 1;
-	        });
-
-	        // Calculate the average percentile rank of all words in the text
-	        var score = ranks.reduce(function(sum, rank) {
-	          return sum + parseFloat(rank);
-	        }, 0) / ranks.length;
-
-	        // Display the Commonality Score
-	        var results = "Commonality Score: " + score.toFixed(2);
-	        document.getElementById("results").innerHTML = results;
-	      }
-	    };
-	    xhr.send();
-	  }
-    </script>
-	  	  
-  </body>
+			// Output results to page
+			document.getElementById('numWords').textContent = numWords;
+			document.getElementById('numLongWords').textContent = numLongWords;
+			document.getElementById('numSentences').textContent = numSentences;
+			document.getElementById('avgWordLength').textContent = avgWordLength.toFixed(2);
+			document.getElementById('avgSentenceLength').textContent = avgSentenceLength.toFixed(2);
+			document.getElementById('lesbarhetsindeks').textContent = lesbarhetsindeks.toFixed(2);
+			document.getElementById('avgWordScore').textContent = avgWordScore.toFixed(2);
+			document.getElementById('avgSentenceScore').textContent = avgSentenceScore.toFixed(2);
+		}
+	</script>
+</head>
+<body>
+	<h1>Text Analysis</h1>
+	<form onsubmit="analyzeText(); return false;">
+		<label for="text">Enter 	Text:</label>
+	<textarea id="text" name="text" rows="10" cols="50"></textarea>
+	<br>
+	<button type="submit">Analyze Text</button>
+</form>
+<h2>Results</h2>
+<p>Number of words: <span id="numWords"></span></p>
+<p>Number of words with more than six letters: <span id="numLongWords"></span></p>
+<p>Number of sentences: <span id="numSentences"></span></p>
+<p>Average word length: <span id="avgWordLength"></span></p>
+<p>Average sentence length: <span id="avgSentenceLength"></span></p>
+<p>Lesbarhetsindeks: <span id="lesbarhetsindeks"></span></p>
+<p>Average word score: <span id="avgWordScore"></span></p>
+<p>Average sentence score: <span id="avgSentenceScore"></span></p>
+</body>
 </html>
-
-
-
