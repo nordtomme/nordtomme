@@ -98,46 +98,38 @@
 	  
 // Calculate Commonality Score
 	  function calculateCommonalityScore() {
-	    // load the word list file
-	    fetch("wordlist.txt")
-	      .then(response => response.text())
-	      .then(wordlist => {
-	        // split the word list into an array of words
-	        const words = wordlist.trim().split('\n');
+	    // Get the text entered by the user
+	    var text = document.getElementById("text").value;
 
-	        // calculate the total percentile rank of all words in the text
-	        let totalPercentileRank = 0;
-	        let numWords = 0;
-	        let unknownWords = 0;
-	        document.getElementById("text").value.toLowerCase().split(/\W+/).forEach(word => {
-	          if (word === "") {
-	            return;
-	          }
-	          const index = words.indexOf(word);
-	          if (index !== -1) {
-	            // word found in list, use its percentile rank
-	            totalPercentileRank += (index + 1) / words.length;
-	          } else {
-	            // word not found in list
-	            unknownWords++;
-	          }
-	          numWords++;
+	    // Load the top 10000 words list
+	    var xhr = new XMLHttpRequest();
+	    xhr.open("GET", "top10000words.txt", true);
+	    xhr.onreadystatechange = function() {
+	      if (xhr.readyState === 4 && xhr.status === 200) {
+	        var words = xhr.responseText.split("\n").map(function(line) {
+	          return line.split(",");
 	        });
 
-	        // calculate the average percentile rank
-	        const averagePercentileRank = totalPercentileRank / numWords;
+	        // Calculate the percentile rank of each word in the text
+	        var ranks = text.toLowerCase().match(/\b\w+\b/g).map(function(word) {
+	          var rank = words.findIndex(function(entry) {
+	            return entry[0] === word;
+	          });
+	          return rank >= 0 ? words[rank][2] : 1;
+	        });
 
-	        // display the results
-	        const results = "Commonality score: " + (1 - averagePercentileRank).toFixed(2) +
-	                        "<br>Words not found in list: " + unknownWords;
+	        // Calculate the average percentile rank of all words in the text
+	        var score = ranks.reduce(function(sum, rank) {
+	          return sum + parseFloat(rank);
+	        }, 0) / ranks.length;
+
+	        // Display the Commonality Score
+	        var results = "Commonality Score: " + score.toFixed(2);
 	        document.getElementById("results").innerHTML = results;
-	      })
-	      .catch(error => {
-	        console.error("Error loading word list:", error);
-	        document.getElementById("results").innerHTML = "Error loading word list.";
-	      });
+	      }
+	    };
+	    xhr.send();
 	  }
-
     </script>
 	  	  
   </body>
