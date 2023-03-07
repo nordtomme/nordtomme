@@ -45,6 +45,32 @@
 			document.getElementById('avgWordScore').textContent = avgWordScore.toFixed(2);
 			document.getElementById('avgSentenceScore').textContent = avgSentenceScore.toFixed(2);
 		}
+		
+	    // Find highest scoring word
+	    let highestWordScore = 0;
+	    let highestWord = "";
+	    words.forEach(word => {
+	      let score = getWordScore(word);
+	      if (score > highestWordScore) {
+	        highestWordScore = score;
+	        highestWord = word;
+	      }
+	    });
+	    document.getElementById("highestWordScore").textContent = highestWordScore;
+	    document.getElementById("highestWord").textContent = highestWord;
+
+	    // Find highest scoring sentence
+	    let highestSentenceScore = 0;
+	    let highestSentence = "";
+	    sentences.forEach(sentence => {
+	      let score = getSentenceScore(sentence);
+	      if (score > highestSentenceScore) {
+	        highestSentenceScore = score;
+	        highestSentence = sentence;
+	      }
+	    });
+	    document.getElementById("highestSentenceScore").textContent = highestSentenceScore;
+	    document.getElementById("highestSentence").textContent = highestSentence;
 	</script>
 </head>
 <body>
@@ -63,6 +89,9 @@
 <p>Average sentence length: <span id="avgSentenceLength"></span></p>
 <p>Lesbarhetsindeks: <span id="lesbarhetsindeks"></span></p>
 <p>Average word score: <span id="avgWordScore"></span></p>
+<p>Highest scoring word: <span id="highestWord"></span> (score: <span id="highestWordScore"></span>)</p>
 <p>Average sentence score: <span id="avgSentenceScore"></span></p>
+<p>Highest scoring sentence: <span id="highestSentence"></span> (score: <span id="highestSentenceScore"></span>)</p>
+
 </body>
 </html>

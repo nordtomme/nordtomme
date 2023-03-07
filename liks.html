@@ -1,25 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Text Analyzer</title>
-	<style>
+	<title>Text Analysis</title>
+	<style type="text/css">
+		#results {
+			margin-top: 20px;
+			padding: 10px;
+			border: 1px solid black;
+			background-color: #EEE;
+			font-family: Arial, sans-serif;
+		}
+		#analyzed-text {
+			margin-top: 20px;
+			padding: 10px;
+			border: 1px solid black;
+			background-color: #FFF;
+			font-family: Arial, sans-serif;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
 		.highlight {
 			background-color: #FFD479;
 		}
-		.longest-words {
+		.longest-word {
 			background-color: #FF7E79;
 		}
 	</style>
 </head>
 <body>
-	<h1>Text Analyzer</h1>
 	<form>
-		<label for="text">Enter Text:</label><br>
-		<textarea id="text" name="text" rows="10" cols="50"></textarea><br>
-		<button type="button" onclick="analyzeText()">Analyze</button>
+		<label for="text-input">Enter text to analyze:</label><br>
+		<textarea id="text-input" rows="10" cols="50"></textarea><br>
+		<input type="button" value="Analyze" onclick="analyzeText()">
 	</form>
 	<div id="results"></div>
-	<div id="text-container"></div>
-	<script src="script.js"></script>
-</body>
-</html>
+	<div id="analyzed-text"></div>
+	<script type="text/javascript">
+		function analyzeText() {
+			var text = document.getElementById("text-input").value;
+			var words = text.split(/\b
