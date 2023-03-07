@@ -5,8 +5,8 @@ function analyzeText() {
   // Calculate the number of words
   const wordCount = text.trim().split(/\s+/).length;
 
-  // Calculate the number of long words (more than 6 letters)
-  const longWordCount = text.match(/\b\w{7,}\b/g) ? text.match(/\b\w{7,}\b/g).length : 0;
+  // Calculate the number of long words (more than 5 letters)
+  const longWordCount = text.match(/\b\w{6,}\b/g) ? text.match(/\b\w{6,}\b/g).length : 0;
 
   // Calculate the average word length
   const words = text.match(/\b\w+\b/g);
