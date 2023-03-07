@@ -133,7 +133,7 @@ const averageSentenceScore = getAverageSentenceScore(inputText);
 
 // Display the results on the webpage
 const resultsDiv = document.getElementById('results');
-resultsDiv.innerHTML = <p>Words: ${words}</p> <p>Long words (> 6 letters): ${longWords}</p> <p>Average word length: ${averageWordLength.toFixed(2)}</p> <p>Sentences: ${sentences}</p> <p>Average words per sentence: ${averageWordsPerSentence.toFixed(2)}</p> <p>Lesbarhetsindeks: ${lesbarhetsindeks.toFixed(2)}</p> <p>Average word score: ${averageWordScore.toFixed(2)}</p> <p>Average sentence score: ${averageSentenceScore.toFixed(2)}</p> ;
+resultsDiv.innerHTML = "<p>Words: ${words}</p> <p>Long words (> 6 letters): ${longWords}</p> <p>Average word length: ${averageWordLength.toFixed(2)}</p> <p>Sentences: ${sentences}</p> <p>Average words per sentence: ${averageWordsPerSentence.toFixed(2)}</p> <p>Lesbarhetsindeks: ${lesbarhetsindeks.toFixed(2)}</p> <p>Average word score: ${averageWordScore.toFixed(2)}</p> <p>Average sentence score: ${averageSentenceScore.toFixed(2)}</p>" ;
 
 // Highlight the top 5% words with highest scrabble score
 

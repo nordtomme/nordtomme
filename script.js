@@ -1,52 +1,39 @@
-// Define scrabble score values for each letter
-const letterValues = {
-	"A": 1, "B": 4, "C": 10, "D": 1, "E": 1, "F": 2, "G": 2, "H": 3, "I": 1,
-	"J": 4, "K": 2, "L": 1, "M": 2, "N": 1, "O": 2, "P": 4, "Q": 10, "R": 1,
-	"S": 1, "T": 1, "U": 4, "V": 4, "W": 8, "X": 10, "Y": 6, "Z": 10, "Æ": 6,
-	"Ø": 5, "Å": 4
-};
-
-// Define common words list
-const commonWords = [];
-
-// Load common words list from file
-fetch("wordlist.txt")
-	.then(response => response.text())
-	.then(text => {
-		// Split the text into an array of words
-		const words = text.trim().split("\n");
-
-		// Loop through the words and store them in the commonWords array
-		for (let i = 0; i < words.length; i++) {
-			commonWords[words[i].toLowerCase()] = i / words.length;
-		}
-	});
-
 function analyzeText() {
-	// Get the text from the textarea
-	const text = document.getElementById("text").value.trim();
+  // Get the input text
+  const text = document.getElementById("text").value;
 
-	// Split the text into an array of words and sentences
-	const words = text.split(/\s+/);
-	const sentences = text.split(/[.?!]+/);
+  // Calculate the number of words
+  const wordCount = text.trim().split(/\s+/).length;
 
-	// Initialize counters and variables
-	let numWords = words.length;
-	let numLongWords = 0;
-	let numSentences = sentences.length - 1; // Last item is an empty string
-	let totalLetters = 0;
-	let totalWordsInSentence = 0;
-	let scrabbleScore = 0;
-	let sentenceScore = 0;
-	let commonWordsScore = 0;
-	let uniqueWords = {};
+  // Calculate the number of long words (more than 6 letters)
+  const longWordCount = text.match(/\b\w{7,}\b/g) ? text.match(/\b\w{7,}\b/g).length : 0;
 
-	// Loop through the words to count long words, calculate total letters, and find unique words
-	for (let i = 0; i < numWords; i++) {
-		const word = words[i].replace(/[^\wÆØÅ]/g, "").toLowerCase(); // Remove non-alphanumeric characters and convert to lowercase
+  // Calculate the average word length
+  const words = text.match(/\b\w+\b/g);
+  const totalWordLength = words ? words.reduce((acc, word) => acc + word.length, 0) : 0;
+  const avgWordLength = totalWordLength / wordCount;
 
-		if (word.length > 6) {
-			numLongWords++;
-		}
+  // Calculate the number of sentences
+  const sentenceCount = text.split(/[.?!]/g).filter(Boolean).length;
 
-	
+  // Calculate the average number of words in each sentence
+  const wordsPerSentence = wordCount / sentenceCount;
+
+  // Calculate the average number of characters in each sentence
+  const charactersPerSentence = totalWordLength / sentenceCount;
+
+  // Calculate the Lesbarhetsindeks
+  const lesbarhetsindeks = ((wordCount / sentenceCount) + (longWordCount * 100 / wordCount)) * (1 / avgWordLength);
+
+  // Display the results
+  const resultsDiv = document.getElementById("results");
+  resultsDiv.innerHTML = `
+    <p>Number of words: ${wordCount}</p>
+    <p>Number of long words (more than 6 letters): ${longWordCount}</p>
+    <p>Average word length: ${avgWordLength.toFixed(2)} characters</p>
+    <p>Number of sentences: ${sentenceCount}</p>
+    <p>Average number of words in each sentence: ${wordsPerSentence.toFixed(2)}</p>
+    <p>Average number of characters in each sentence: ${charactersPerSentence.toFixed(2)} characters</p>
+    <p>Lesbarhetsindeks: ${lesbarhetsindeks.toFixed(2)}</p>
+  `;
+}
