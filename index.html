@@ -1,121 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Text Analysis</title>
-	<script>
-		// Define function to calculate scrabble score of a word
-		function getWordScore(word) {
-			const letterValues = {
-				'a': 1, 'b': 4, 'c': 10, 'd': 1, 'e': 1, 'f': 2, 'g': 2, 'h': 3,
-				'i': 1, 'j': 4, 'k': 2, 'l': 1, 'm': 2, 'n': 1, 'o': 2, 'p': 4,
-				'q': 10, 'r': 1, 's': 1, 't': 1, 'u': 4, 'v': 4, 'w': 8, 'x': 10,
-				'y': 6, 'z': 10, 'æ': 6, 'ø': 5, 'å': 4
-			};
-			let score = 0;
-			for (let i = 0; i < word.length; i++) {
-				score += letterValues[word[i].toLowerCase()] || 0;
-			}
-			return score;
-		}
-
-		// Define function to analyze text on form submit
-		function analyzeText() {
-			const text = document.getElementById('text').value;
-			const words = text.trim().split(/\s+/);
-			const sentences = text.trim().split(/[.!?]/).filter(Boolean);
-
-			const numWords = words.length;
-			const numLongWords = words.filter(word => word.length > 6).length;
-			const numSentences = sentences.length;
-			const avgWordLength = numWords > 0 ? words.join('').length / numWords : 0;
-			const avgSentenceLength = numSentences > 0 ? numWords / numSentences : 0;
-			const lesbarhetsindeks = numWords > 0 ? (numWords / numSentences + 100 * numLongWords / numWords) / 2 : 0;
-			const wordScores = words.map(getWordScore);
-			const avgWordScore = numWords > 0 ? wordScores.reduce((sum, score) => sum + score, 0) / numWords : 0;
-			const sentenceScores = sentences.map(sentence => sentence.split(/\s+/).map(getWordScore).reduce((sum, score) => sum + score, 0));
-			const avgSentenceScore = numSentences > 0 ? sentenceScores.reduce((sum, score) => sum + score, 0) / numSentences : 0;
-
-		    // Find highest scoring word
-		    let highestWordScore = 0;
-		    let highestWord = "";
-		    words.forEach(word => {
-		      let score = getWordScore(word);
-		      if (score > highestWordScore) {
-		        highestWordScore = score;
-		        highestWord = word;
-		      }
-		    });
-		   
-		    // Find highest scoring sentence
-		    let highestSentenceScore = 0;
-		    let highestSentence = "";
-		    sentences.forEach(sentence => {
-		      let score = getSentenceScore(sentence);
-		      if (score > highestSentenceScore) {
-		        highestSentenceScore = score;
-		        highestSentence = sentence;
-		      }
-		    });
-
-		    // Highlight highest scoring words
-		    let wordsWithScores = words.map(word => {
-		      return { word: word, score: getWordScore(word) };
-		    });
-		    wordsWithScores.sort((a, b) => b.score - a.score);
-		    let numHighlightedWords = Math.ceil(words.length * 0.04);
-		    let highlightedWords = wordsWithScores.slice(0, numHighlightedWords).map(word => word.word);
-		    let highlightedText = text.replace(/\b\w+\b/g, match => {
-		      if (highlightedWords.includes(match)) {
-		        return `<mark>${match}</mark>`;
-		      } else {
-		        return match;
-		      }
-		    });
-			
-			// Output results to page
-			document.getElementById('numWords').textContent = numWords;
-			document.getElementById('numLongWords').textContent = numLongWords;
-			document.getElementById('numSentences').textContent = numSentences;
-			document.getElementById('avgWordLength').textContent = avgWordLength.toFixed(2);
-			document.getElementById('avgSentenceLength').textContent = avgSentenceLength.toFixed(2);
-			document.getElementById('lesbarhetsindeks').textContent = lesbarhetsindeks.toFixed(2);
-			document.getElementById('avgWordScore').textContent = avgWordScore.toFixed(2);
-			document.getElementById('avgSentenceScore').textContent = avgSentenceScore.toFixed(2);
-		    document.getElementById("highestWordScore").textContent = highestWordScore;
-		    document.getElementById("highestWord").textContent = highestWord;
-		    document.getElementById("highestSentenceScore").textContent = highestSentenceScore;
-		    document.getElementById("highestSentence").textContent = highestSentence;
-		    document.getElementById("highlightedText").innerHTML = highlightedText;			
-			
-		}
-		
-		
-	
-		
-	</script>
+	<title>Text Analyzer</title>
+	<script src="textAnalyzer.js"></script>
 </head>
 <body>
-	<h1>Text Analysis</h1>
-	<form onsubmit="analyzeText(); return false;">
-		<label for="text">Enter 	Text:</label>
-	<textarea id="text" name="text" rows="10" cols="50"></textarea>
-	<br>
-	<button type="submit">Analyze Text</button>
-</form>
-<h2>Results</h2>
-<p>Number of words: <span id="numWords"></span></p>
-<p>Number of words with more than six letters: <span id="numLongWords"></span></p>
-<p>Number of sentences: <span id="numSentences"></span></p>
-<p>Average word length: <span id="avgWordLength"></span></p>
-<p>Average sentence length: <span id="avgSentenceLength"></span></p>
-<p>Lesbarhetsindeks: <span id="lesbarhetsindeks"></span></p>
-<p>Average word score: <span id="avgWordScore"></span></p>
-<p>Highest scoring word: <span id="highestWord"></span> (score: <span id="highestWordScore"></span>)</p>
-<p>Average sentence score: <span id="avgSentenceScore"></span></p>
-<p>Highest scoring sentence: <span id="highestSentence"></span> (score: <span id="highestSentenceScore"></span>)</p>
-
-<h2>Highlighted Text</h2>
-<p id="highlightedText"></p>
-
+	<h1>Text Analyzer</h1>
+	<form>
+		<label for="inputText">Enter text:</label><br>
+		<textarea id="inputText" name="inputText" rows="10" cols="50"></textarea><br>
+		<button type="button" onclick="analyzeText()">Analyze Text</button>
+	</form>
+	<div id="results"></div>
+	<div id="highlightedText"></div>
 </body>
 </html>
