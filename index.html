@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Text Analysis</title>
+  </head>
+  <body>
+    <h1>Text Analysis</h1>
+    <form>
+      <label for="text">Enter text:</label>
+      <textarea id="text" name="text" rows="10" cols="50"></textarea>
+      <br>
+      <button type="button" onclick="analyze()">LIKS</button>
+      <button type="button" onclick="calculateScrabbleScore()">Scrabble Score</button>
+	  <button type="button" onclick="calculateCommonalityScore()">Commonality Score</button>
+	  
+	  
+    </form>
+    <p id="results"></p>
+
+    <script>
+      function analyze() {
+        // Get the text entered by the user
+        var text = document.getElementById("text").value;
+
+        // Count the number of words in the text
+        var wordCount = text.split(/\s+/).length;
+
+        // Count the number of words with more than six letters
+        var longWordCount = text.split(/\s+/).filter(function(word) {
+          return word.length > 6;
+        }).length;
+
+        // Count the number of sentences in the text
+        var sentenceCount = text.split(/[.!?]+/).length - 1;
+
+        // Calculate the average number of letters in each word
+        var averageLetters = text.split(/\s+/).reduce(function(total, word) {
+          return total + word.length;
+        }, 0) / wordCount;
+
+        // Calculate the average number of words in each sentence
+        var averageWords = wordCount / sentenceCount;
+
+	    // Calculate the LIKS score
+	    var liks = (wordCount / sentenceCount) + (longWordCount * 100 / wordCount);
+		
+        // Display the results
+        var results = "Number of words: " + wordCount + "<br>" +
+                      "Number of words with more than six letters: " + longWordCount + "<br>" +
+                      "Number of sentences: " + sentenceCount + "<br>" +
+                      "Average number of letters per word: " + averageLetters.toFixed(2) + "<br>" +
+                      "Average number of words per sentence: " + averageWords.toFixed(2) + "<br>" +
+					  "LIKS score: " + liks.toFixed(2);
+        document.getElementById("results").innerHTML = results;
+      }
+	 
+// Calculate Scrabble Score
+	  function calculateScrabbleScore() {
+	    // Define the values of each letter
+	    var letterValues = {
+	      "A": 1, "B": 4, "C": 10, "D": 1, "E": 1, "F": 2, "G": 2, "H": 3, "I": 1,
+	      "J": 4, "K": 2, "L": 1, "M": 2, "N": 1, "O": 2, "P": 4, "Q": 10, "R": 1,
+	      "S": 1, "T": 1, "U": 4, "V": 4, "W": 8, "X": 10, "Y": 6, "Z": 10,
+	      "Æ": 6, "Ø": 5, "Å": 4
+	    };
+
+	    // Get the text entered by the user
+	    var text = document.getElementById("text").value;
+
+	    // Split the text into words
+	    var words = text.split(/\s+/);
+
+	    // Calculate the scrabble score of each word
+	    var wordScores = words.map(function(word) {
+	      // Convert the word to uppercase to simplify lookup in the letterValues object
+	      var upperCaseWord = word.toUpperCase();
+
+	      // Calculate the score for each letter in the word
+	      var score = 0;
+	      for (var i = 0; i < upperCaseWord.length; i++) {
+	        var letter = upperCaseWord[i];
+	        score += letterValues[letter] || 0;
+	      }
+
+	      return score;
+	    });
+
+	    // Calculate the average scrabble score of all the words
+	    var averageScore = wordScores.reduce(function(total, score) {
+	      return total + score;
+	    }, 0) / wordScores.length;
+
+	    // Display the average scrabble score on the webpage
+	    var results = "Average scrabble score: " + averageScore.toFixed(2);
+	    document.getElementById("results").innerHTML = results;
+	  }
+	  
+// Calculate Commonality Score
+	  function calculateCommonalityScore() {
+	    // load the word list file
+	    fetch("wordlist.txt")
+	      .then(response => response.text())
+	      .then(wordlist => {
+	        // split the word list into an array of words
+	        const words = wordlist.trim().split('\n');
+
+	        // calculate the total percentile rank of all words in the text
+	        let totalPercentileRank = 0;
+	        let numWords = 0;
+	        let unknownWords = 0;
+	        document.getElementById("text").value.toLowerCase().split(/\W+/).forEach(word => {
+	          if (word === "") {
+	            return;
+	          }
+	          const index = words.indexOf(word);
+	          if (index !== -1) {
+	            // word found in list, use its percentile rank
+	            totalPercentileRank += (index + 1) / words.length;
+	          } else {
+	            // word not found in list
+	            unknownWords++;
+	          }
+	          numWords++;
+	        });
+
+	        // calculate the average percentile rank
+	        const averagePercentileRank = totalPercentileRank / numWords;
+
+	        // display the results
+	        const results = "Commonality score: " + (1 - averagePercentileRank).toFixed(2) +
+	                        "<br>Words not found in list: " + unknownWords;
+	        document.getElementById("results").innerHTML = results;
+	      })
+	      .catch(error => {
+	        console.error("Error loading word list:", error);
+	        document.getElementById("results").innerHTML = "Error loading word list.";
+	      });
+	  }
+
+    </script>
+	  	  
+  </body>
+</html>
+
+
+
