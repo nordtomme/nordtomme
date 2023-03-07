@@ -35,6 +35,43 @@
 			const sentenceScores = sentences.map(sentence => sentence.split(/\s+/).map(getWordScore).reduce((sum, score) => sum + score, 0));
 			const avgSentenceScore = numSentences > 0 ? sentenceScores.reduce((sum, score) => sum + score, 0) / numSentences : 0;
 
+		    // Find highest scoring word
+		    let highestWordScore = 0;
+		    let highestWord = "";
+		    words.forEach(word => {
+		      let score = getWordScore(word);
+		      if (score > highestWordScore) {
+		        highestWordScore = score;
+		        highestWord = word;
+		      }
+		    });
+		   
+		    // Find highest scoring sentence
+		    let highestSentenceScore = 0;
+		    let highestSentence = "";
+		    sentences.forEach(sentence => {
+		      let score = getSentenceScore(sentence);
+		      if (score > highestSentenceScore) {
+		        highestSentenceScore = score;
+		        highestSentence = sentence;
+		      }
+		    });
+
+		    // Highlight highest scoring words
+		    let wordsWithScores = words.map(word => {
+		      return { word: word, score: getWordScore(word) };
+		    });
+		    wordsWithScores.sort((a, b) => b.score - a.score);
+		    let numHighlightedWords = Math.ceil(words.length * 0.04);
+		    let highlightedWords = wordsWithScores.slice(0, numHighlightedWords).map(word => word.word);
+		    let highlightedText = text.replace(/\b\w+\b/g, match => {
+		      if (highlightedWords.includes(match)) {
+		        return `<mark>${match}</mark>`;
+		      } else {
+		        return match;
+		      }
+		    });
+			
 			// Output results to page
 			document.getElementById('numWords').textContent = numWords;
 			document.getElementById('numLongWords').textContent = numLongWords;
@@ -44,49 +81,16 @@
 			document.getElementById('lesbarhetsindeks').textContent = lesbarhetsindeks.toFixed(2);
 			document.getElementById('avgWordScore').textContent = avgWordScore.toFixed(2);
 			document.getElementById('avgSentenceScore').textContent = avgSentenceScore.toFixed(2);
+		    document.getElementById("highestWordScore").textContent = highestWordScore;
+		    document.getElementById("highestWord").textContent = highestWord;
+		    document.getElementById("highestSentenceScore").textContent = highestSentenceScore;
+		    document.getElementById("highestSentence").textContent = highestSentence;
+		    document.getElementById("highlightedText").innerHTML = highlightedText;			
+			
 		}
 		
-	    // Find highest scoring word
-	    let highestWordScore = 0;
-	    let highestWord = "";
-	    words.forEach(word => {
-	      let score = getWordScore(word);
-	      if (score > highestWordScore) {
-	        highestWordScore = score;
-	        highestWord = word;
-	      }
-	    });
-	    document.getElementById("highestWordScore").textContent = highestWordScore;
-	    document.getElementById("highestWord").textContent = highestWord;
-
-	    // Find highest scoring sentence
-	    let highestSentenceScore = 0;
-	    let highestSentence = "";
-	    sentences.forEach(sentence => {
-	      let score = getSentenceScore(sentence);
-	      if (score > highestSentenceScore) {
-	        highestSentenceScore = score;
-	        highestSentence = sentence;
-	      }
-	    });
-	    document.getElementById("highestSentenceScore").textContent = highestSentenceScore;
-	    document.getElementById("highestSentence").textContent = highestSentence;
 		
-	    // Highlight highest scoring words
-	    let wordsWithScores = words.map(word => {
-	      return { word: word, score: getWordScore(word) };
-	    });
-	    wordsWithScores.sort((a, b) => b.score - a.score);
-	    let numHighlightedWords = Math.ceil(words.length * 0.04);
-	    let highlightedWords = wordsWithScores.slice(0, numHighlightedWords).map(word => word.word);
-	    let highlightedText = text.replace(/\b\w+\b/g, match => {
-	      if (highlightedWords.includes(match)) {
-	        return `<mark>${match}</mark>`;
-	      } else {
-	        return match;
-	      }
-	    });
-	    document.getElementById("highlightedText").innerHTML = highlightedText;
+	
 		
 	</script>
 </head>
