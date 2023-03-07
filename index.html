@@ -71,6 +71,23 @@
 	    });
 	    document.getElementById("highestSentenceScore").textContent = highestSentenceScore;
 	    document.getElementById("highestSentence").textContent = highestSentence;
+		
+	    // Highlight highest scoring words
+	    let wordsWithScores = words.map(word => {
+	      return { word: word, score: getWordScore(word) };
+	    });
+	    wordsWithScores.sort((a, b) => b.score - a.score);
+	    let numHighlightedWords = Math.ceil(words.length * 0.04);
+	    let highlightedWords = wordsWithScores.slice(0, numHighlightedWords).map(word => word.word);
+	    let highlightedText = text.replace(/\b\w+\b/g, match => {
+	      if (highlightedWords.includes(match)) {
+	        return `<mark>${match}</mark>`;
+	      } else {
+	        return match;
+	      }
+	    });
+	    document.getElementById("highlightedText").innerHTML = highlightedText;
+		
 	</script>
 </head>
 <body>
@@ -92,6 +109,9 @@
 <p>Highest scoring word: <span id="highestWord"></span> (score: <span id="highestWordScore"></span>)</p>
 <p>Average sentence score: <span id="avgSentenceScore"></span></p>
 <p>Highest scoring sentence: <span id="highestSentence"></span> (score: <span id="highestSentenceScore"></span>)</p>
+
+<h2>Highlighted Text</h2>
+<p id="highlightedText"></p>
 
 </body>
 </html>
