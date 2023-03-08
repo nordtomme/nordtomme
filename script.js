@@ -86,26 +86,4 @@ function analyzeText() {
     <p>Ordvariasjon (OVIX): ${ovix.toFixed(2)}</p>
   `;
   
-// Load the word list from file
- fetch('wordlist.txt')
-   .then(response => response.text())
-   .then(wordlist => {
-     // Split the text into words
-     // const inputText = document.getElementById('input-text').value;
-     // const words = inputText.split(/\W+/);
-
-     // Calculate the percentile rank for each word
-     const ranks = words.map(word => {
-       const rank = wordlist.indexOf(word.toLowerCase());
-       return rank >= 0 ? rank / 10000 : 1;
-     });
-
-     // Calculate the average percentile rank
-     const sum = ranks.reduce((acc, rank) => acc + rank, 0);
-     const average = sum / ranks.length;
-
-     // Display the result
-     alert(`Common Words Score: ${average}`);
-   });
-
 }
