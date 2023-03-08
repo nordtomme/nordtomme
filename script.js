@@ -72,26 +72,6 @@ function analyzeText() {
   });
   let averageSentenceScore = totalSentenceScore / sentenceCount;
   
-// Calculate and display common words score
-	//Load the word list from file
- fetch('wordlist.txt')
-   .then(response => response.text())
-   .then(wordlist => {
-     // Split the text into words
- //    const inputText = document.getElementById('text').value;
- //   const words = inputText.split(/\W+/);
-
-     // Calculate the percentile rank for each word
-     const ranks = words.map(word => {
-       const rank = wordlist.indexOf(word.toLowerCase());
-       return rank >= 0 ? rank / 10000 : 1;
-     });
-
-     // Calculate the average percentile rank
-     const sum = ranks.reduce((acc, rank) => acc + rank, 0);
-     const average = sum / ranks.length;
-   });
-   
   // Display results
   let resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = `
@@ -104,8 +84,28 @@ function analyzeText() {
     <p>Gj.sn. Scrabble Score pr. setning er ${averageSentenceScore.toFixed(2)}</p>
     <p>Lesbarhet (LIKS): ${lesbarhetsindeks.toFixed(2)}</p>
     <p>Ordvariasjon (OVIX): ${ovix.toFixed(2)}</p>
-    <p>Vanlige ord (0-100): ${average}</p>
   `;
   
+// Load the word list from file
+ fetch('wordlist.txt')
+   .then(response => response.text())
+   .then(wordlist => {
+     // Split the text into words
+     // const inputText = document.getElementById('input-text').value;
+     // const words = inputText.split(/\W+/);
+
+     // Calculate the percentile rank for each word
+     const ranks = words.map(word => {
+       const rank = wordlist.indexOf(word.toLowerCase());
+       return rank >= 0 ? rank / 10000 : 1;
+     });
+
+     // Calculate the average percentile rank
+     const sum = ranks.reduce((acc, rank) => acc + rank, 0);
+     const average = sum / ranks.length;
+
+     // Display the result
+     alert(`Common Words Score: ${average}`);
+   });
 
 }
