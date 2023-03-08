@@ -1,39 +1,111 @@
 function analyzeText() {
-  // Get the input text
-  const text = document.getElementById("text").value;
+  let text = document.getElementById("text").value;
 
-  // Calculate the number of words
-  const wordCount = text.trim().split(/\s+/).length;
+  // Remove empty lines and trailing white spaces
+  text = text.replace(/^\s*$(?:\r\n?|\n)/gm, '').trim();
 
-  // Calculate the number of long words (more than 5 letters)
-  const longWordCount = text.match(/\b\w{6,}\b/g) ? text.match(/\b\w{6,}\b/g).length : 0;
+  // Count characters (including spaces)
+  let charCount = text.length;
 
-  // Calculate the average word length
-  const words = text.match(/\b\w+\b/g);
-  const totalWordLength = words ? words.reduce((acc, word) => acc + word.length, 0) : 0;
-  const avgWordLength = totalWordLength / wordCount;
+  // Count words
+  let wordCount = text.split(/\s+/).length;
 
-  // Calculate the number of sentences
-  const sentenceCount = text.split(/[.?!]/g).filter(Boolean).length;
+  // Count sentences
+  let sentenceCount = text.split(/[.?!]+/).length - 1;
 
-  // Calculate the average number of words in each sentence
-  const wordsPerSentence = wordCount / sentenceCount;
+  // Count paragraphs
+  let paragraphCount = text.split(/\n\n+/).length;
 
-  // Calculate the average number of characters in each sentence
-  const charactersPerSentence = totalWordLength / sentenceCount;
+  // Calculate Lesbarhetsindeks
+  let words = text.match(/\b\w+\b/g);
+  let longWords = words.filter(word => word.length >= 7).length;
+  let lesbarhetsindeks = (wordCount / sentenceCount) + ((longWords * 100) / wordCount);
 
-  // Calculate the Lesbarhetsindeks
-  const lesbarhetsindeks = ((wordCount / sentenceCount) + (longWordCount * 100 / wordCount)) * (1 / avgWordLength);
+  // Calculate OVIX score
+  let uniqueWords = new Set(words);
+  let ovix = Math.log(wordCount) / Math.log(2 - (Math.log(uniqueWords.size) / Math.log(wordCount)));
 
-  // Display the results
-  const resultsDiv = document.getElementById("results");
+  // Calculate average word score
+  let letterValues = {
+    "b": 4,
+    "c": 10,
+    "f": 2,
+    "g": 2,
+    "h": 3,
+    "j": 4,
+    "k": 2,
+    "m": 2,
+    "o": 2,
+    "p": 4,
+    "q": 10,
+    "u": 4,
+    "v": 4,
+    "w": 8,
+    "x": 10,
+    "y": 6,
+    "z": 10,
+    "æ": 6,
+    "ø": 5,
+    "å": 4
+  };
+
+  let totalWordScore = 0;
+  words.forEach(word => {
+    let wordScore = 0;
+    for (let i = 0; i < word.length; i++) {
+      let letterValue = letterValues[word[i].toLowerCase()] || 1;
+      wordScore += letterValue;
+    }
+    totalWordScore += wordScore;
+  });
+  let averageWordScore = totalWordScore / wordCount;
+
+  let sentences = text.match(/[^.!?]+[.!?]/g);
+  let totalSentenceScore = 0;
+  sentences.forEach(sentence => {
+    let sentenceScore = 0;
+    for (let i = 0; i < sentence.length; i++) {
+      let letterValue = letterValues[sentence[i].toLowerCase()] || 1;
+      sentenceScore += letterValue;
+    }
+    totalSentenceScore += sentenceScore;
+  });
+  let averageSentenceScore = totalSentenceScore / sentenceCount;
+  
+// Calculate and display common words score
+	//Load the word list from file
+ fetch('wordlist.txt')
+   .then(response => response.text())
+   .then(wordlist => {
+     // Split the text into words
+ //    const inputText = document.getElementById('text').value;
+ //   const words = inputText.split(/\W+/);
+
+     // Calculate the percentile rank for each word
+     const ranks = words.map(word => {
+       const rank = wordlist.indexOf(word.toLowerCase());
+       return rank >= 0 ? rank / 10000 : 1;
+     });
+
+     // Calculate the average percentile rank
+     const sum = ranks.reduce((acc, rank) => acc + rank, 0);
+     const average = sum / ranks.length;
+   });
+   
+  // Display results
+  let resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = `
-    <p>Number of words: ${wordCount}</p>
-    <p>Number of long words (more than 6 letters): ${longWordCount}</p>
-    <p>Average word length: ${avgWordLength.toFixed(2)} characters</p>
-    <p>Number of sentences: ${sentenceCount}</p>
-    <p>Average number of words in each sentence: ${wordsPerSentence.toFixed(2)}</p>
-    <p>Average number of characters in each sentence: ${charactersPerSentence.toFixed(2)} characters</p>
-    <p>Lesbarhetsindeks: ${lesbarhetsindeks.toFixed(2)}</p>
+    <p>Teksten best&aring;r av<br />
+  	${charCount} tegn<br />
+  	${wordCount} ord<br />
+    ${sentenceCount} setninger og<br />
+    ${paragraphCount} avsnitt.</p>
+    <p>Gj.sn. Scrabble Score pr. ord er ${averageWordScore.toFixed(2)}</p>
+    <p>Gj.sn. Scrabble Score pr. setning er ${averageSentenceScore.toFixed(2)}</p>
+    <p>Lesbarhet (LIKS): ${lesbarhetsindeks.toFixed(2)}</p>
+    <p>Ordvariasjon (OVIX): ${ovix.toFixed(2)}</p>
+    <p>Vanlige ord (0-100): ${average}</p>
   `;
+  
+
 }
